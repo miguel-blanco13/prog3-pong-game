@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://www.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Herencia del proyecto padre -->
+    <parent>
+        <groupId>co.edu.uptc</groupId>
+        <artifactId>pong</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <!-- Identidad del módulo -->
+    <artifactId>app</artifactId>
+    <name>app</name>
+    <description>Módulo principal ejecutable del juego Pong</description>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- Dependencia interna -->
+        <dependency>
+            <groupId>co.edu.uptc</groupId>
+            <artifactId>config-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Lombok solo en compilación -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Plugin para generar FAT JAR ejecutable -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <!-- Idealmente esta versión debería ir en el parent -->
+                <version>3.5.1</version>
+
+                <executions>
+                    <execution>
+                        <id>build-fat-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+
+                        <configuration>
+                            <!-- Nombre dinámico del JAR -->
+                            <outputFile>
+                                ${project.parent.basedir}/dist/${project.parent.artifactId}-${project.version}.jar
+                            </outputFile>
+
+                            <!-- Define el punto de entrada -->
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>co.edu.uptc.Main</mainClass>
+                                </transformer>
+
+                                <!-- Soporte para SPI -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+
+                            <!-- Evita conflictos de firmas -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+
+                            <!-- Opcional: reduce tamaño del JAR -->
+                            <!-- <minimizeJar>true</minimizeJar> -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

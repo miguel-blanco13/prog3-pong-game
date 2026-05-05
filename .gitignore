@@ -1,0 +1,26 @@
+# Maven — generados en compilación, nunca se versionan
+target/
+dist/
+dependency-reduced-pom.xml
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# Logs y salidas
+logs/
+output/
+
+# Herramientas internas
+agent_docs/
+
+# Claude (Cowork) — contexto local, no va a GitHub
+CLAUDE.md
+.claude/
+PLAN_APRENDIZAJE.html
