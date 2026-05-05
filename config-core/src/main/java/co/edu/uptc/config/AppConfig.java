@@ -1,27 +1,10 @@
 package co.edu.uptc.config;
 
-/**
- * Fachada tipada sobre GlobalConfig.
- *
- * ¿Por qué esta clase existe si GlobalConfig ya tiene get()?
- *
- * Sin AppConfig, cualquier parte del código haría:
- *   double speed = Double.parseDouble(GlobalConfig.getInstance().get("ball.speed"));
- *
- * Eso tiene tres problemas:
- *   1. Repites el parse en cada lugar que lo necesites.
- *   2. Si la clave cambia de "ball.speed" a "ball.velocity", buscas y reemplazas en todo el proyecto.
- *   3. Si el valor no existe, el parseDouble explota sin mensaje claro.
- *
- * Con AppConfig, el resto del código simplemente llama AppConfig.getBallSpeed()
- * y no sabe nada de Properties, claves, ni parseo.
- * Este patrón se llama "Facade" (fachada).
- */
 public class AppConfig {
 
     private static final GlobalConfig cfg = GlobalConfig.getInstance();
 
-    private AppConfig() {}   // clase utilitaria — no se instancia
+    private AppConfig() {}
 
     public static String getAppName() {
         return cfg.get("app.name", "Pong");

@@ -4,17 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * Singleton que carga config.properties desde el classpath.
- *
- * ¿Por qué Singleton? Porque cargar un archivo del disco es costoso.
- * Con Singleton lo hacemos UNA sola vez y reutilizamos el resultado.
- *
- * ¿Por qué classpath y no una ruta absoluta?
- * Porque cuando el proyecto se empaqueta en un JAR, los archivos de
- * resources quedan dentro del JAR. ClassLoader sabe cómo leerlos
- * desde adentro; una ruta como "C:/archivos/config.properties" no.
- */
 public class GlobalConfig {
 
     private static final String CONFIG_FILE = "config.properties";
@@ -37,7 +26,7 @@ public class GlobalConfig {
                                         .getResourceAsStream(CONFIG_FILE)) {
             if (in != null) props.load(in);
         } catch (IOException e) {
-            throw new RuntimeException("No se pudo cargar: " + CONFIG_FILE, e);
+            throw new RuntimeException("Failed to load: " + CONFIG_FILE, e);
         }
     }
 

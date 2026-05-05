@@ -20,22 +20,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!--
-        dependencyManagement define la versión UNA SOLA VEZ para todo el proyecto.
-        Los módulos hijos declaran la dependencia SIN versión — la heredan de aquí.
-        Así si mañana cambias a Lombok 1.19, solo editas este archivo.
-    -->
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>1.18.30</version>
-                <!--
-                    scope=provided: Lombok solo es necesario al COMPILAR.
-                    En el JAR final no necesita estar — no tiene código en runtime.
-                    Maven lo excluye automáticamente del fat JAR.
-                -->
                 <scope>provided</scope>
             </dependency>
         </dependencies>

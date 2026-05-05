@@ -12,7 +12,7 @@
 
     <artifactId>config-core</artifactId>
     <name>config-core</name>
-    <description>Módulo de configuración base del proyecto Pong</description>
+    <description>Reusable configuration library for the Pong game</description>
     <packaging>jar</packaging>
 
     <dependencies>
