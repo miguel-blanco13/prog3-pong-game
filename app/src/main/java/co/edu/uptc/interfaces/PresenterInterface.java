@@ -1,6 +1,7 @@
 package co.edu.uptc.interfaces;
 
 public interface PresenterInterface {
+    void setView(ViewInterface view);
     void setModel(ModelInterface model);
     void onKeyPressed(int keyCode);
     void onKeyReleased(int keyCode);

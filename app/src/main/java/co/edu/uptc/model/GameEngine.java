@@ -21,7 +21,7 @@ public class GameEngine implements ModelInterface {
     private volatile boolean gameOver;
     private volatile boolean paused;
     private boolean darkMode;
-    private boolean circleBall;
+    private boolean circleBall = true;
     private double speedMultiplier = 1.0;
     private int fieldWidth  = 800;
     private int fieldHeight = 600;
