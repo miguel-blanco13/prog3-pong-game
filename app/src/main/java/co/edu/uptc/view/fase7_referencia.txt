@@ -1,0 +1,282 @@
+================================================================================
+FASE 7 — REFERENCIA COMPLETA
+Archivos de la capa View
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+ARCHIVO 1: view/pong/util/GameTheme.java
+────────────────────────────────────────────────────────────────────────────────
+
+package co.edu.uptc.view.pong.util;
+
+import java.awt.Color;
+import java.awt.Font;
+
+public final class GameTheme {
+
+    private GameTheme() {}
+
+    public static final Color BG_DARK      = Color.decode("#0A0A0A");
+    public static final Color BG_LIGHT     = Color.decode("#F5F5F5");
+    public static final Color ACCENT_NEON  = Color.decode("#CBFB2B");
+    public static final Color WALL_DANGER  = Color.decode("#FF3B3B");
+    public static final Color PADDLE_DARK  = Color.WHITE;
+    public static final Color PADDLE_LIGHT = Color.decode("#1A1A1A");
+    public static final Color BALL_COLOR   = Color.decode("#CBFB2B");
+    public static final Color BORDER_COLOR = Color.decode("#2a2a2a");
+    public static final Color PANEL_SIDE   = Color.decode("#141414");
+
+    public static final Font FONT_HUD        = new Font(Font.MONOSPACED, Font.BOLD,  18);
+    public static final Font FONT_TITLE      = new Font(Font.MONOSPACED, Font.BOLD,  72);
+    public static final Font FONT_SIDE_LABEL = new Font(Font.MONOSPACED, Font.PLAIN, 13);
+}
+
+
+────────────────────────────────────────────────────────────────────────────────
+ARCHIVO 2: view/pong/util/GamePanelBase.java
+────────────────────────────────────────────────────────────────────────────────
+
+package co.edu.uptc.view.pong.util;
+
+import javax.swing.JPanel;
+
+public class GamePanelBase extends JPanel {
+
+    public GamePanelBase() {
+        setOpaque(false);
+    }
+}
+
+
+────────────────────────────────────────────────────────────────────────────────
+ARCHIVO 3: view/pong/GamePanel.java
+────────────────────────────────────────────────────────────────────────────────
+
+package co.edu.uptc.view.pong;
+
+import co.edu.uptc.dto.GameStateDto;
+import co.edu.uptc.pojo.Ball;
+import co.edu.uptc.pojo.Paddle;
+import co.edu.uptc.view.pong.util.GamePanelBase;
+import co.edu.uptc.view.pong.util.GameTheme;
+
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+
+public class GamePanel extends GamePanelBase {
+
+    private GameStateDto state;
+
+    public void applyState(GameStateDto state) {
+        this.state = state;
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (state == null) return;
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        drawBackground(g2);
+        drawBoundaryBox(g2);
+        drawBalls(g2);
+        drawPaddle(g2);
+        drawDangerWall(g2);
+    }
+
+    private void drawBackground(Graphics2D g2) {
+        g2.setColor(state.isDarkMode() ? GameTheme.BG_DARK : GameTheme.BG_LIGHT);
+        g2.fillRect(0, 0, getWidth(), getHeight());
+    }
+
+    private void drawBoundaryBox(Graphics2D g2) {
+        g2.setColor(GameTheme.BORDER_COLOR);
+        g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+    }
+
+    private void drawBalls(Graphics2D g2) {
+        g2.setColor(GameTheme.BALL_COLOR);
+        for (Ball b : state.getBalls()) {
+            int x = (int) b.getX();
+            int y = (int) b.getY();
+            int s = (int) b.getSize();
+            if (state.isCircleBall()) g2.fillOval(x, y, s, s);
+            else                      g2.fillRect(x, y, s, s);
+        }
+    }
+
+    private void drawPaddle(Graphics2D g2) {
+        Paddle p = state.getPaddle();
+        g2.setColor(state.isDarkMode() ? GameTheme.PADDLE_DARK : GameTheme.PADDLE_LIGHT);
+        g2.fillRect(p.getX(), p.getY(), p.getWidth(), p.getHeight());
+    }
+
+    private void drawDangerWall(Graphics2D g2) {
+        g2.setColor(GameTheme.WALL_DANGER);
+        g2.drawLine(getWidth() - 1, 0, getWidth() - 1, getHeight());
+    }
+}
+
+
+────────────────────────────────────────────────────────────────────────────────
+ARCHIVO 4: view/pong/SideInfoPanel.java
+────────────────────────────────────────────────────────────────────────────────
+
+package co.edu.uptc.view.pong;
+
+import co.edu.uptc.dto.GameStateDto;
+import co.edu.uptc.pojo.Ball;
+import co.edu.uptc.view.pong.util.GameTheme;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import java.awt.Dimension;
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
+
+public class SideInfoPanel extends JPanel {
+
+    private final JLabel scoreLabel   = new JLabel();
+    private final JLabel speedLabel   = new JLabel();
+    private final JLabel startLabel   = new JLabel();
+    private final JLabel elapsedLabel = new JLabel();
+    private final JPanel bouncesPanel = new JPanel();
+
+    public SideInfoPanel() {
+        setBackground(GameTheme.PANEL_SIDE);
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setPreferredSize(new Dimension(180, 0));
+        initLabels();
+        addComponents();
+    }
+
+    private void initLabels() {
+        styleLabel(scoreLabel);
+        styleLabel(speedLabel);
+        styleLabel(startLabel);
+        styleLabel(elapsedLabel);
+        bouncesPanel.setBackground(GameTheme.PANEL_SIDE);
+        bouncesPanel.setLayout(new BoxLayout(bouncesPanel, BoxLayout.Y_AXIS));
+    }
+
+    private void styleLabel(JLabel label) {
+        label.setFont(GameTheme.FONT_SIDE_LABEL);
+        label.setForeground(GameTheme.ACCENT_NEON);
+        label.setAlignmentX(LEFT_ALIGNMENT);
+    }
+
+    private void addComponents() {
+        add(Box.createVerticalStrut(16));
+        add(scoreLabel);
+        add(Box.createVerticalStrut(8));
+        add(speedLabel);
+        add(Box.createVerticalStrut(8));
+        add(startLabel);
+        add(Box.createVerticalStrut(8));
+        add(elapsedLabel);
+        add(Box.createVerticalStrut(8));
+        add(bouncesPanel);
+    }
+
+    public void applyState(GameStateDto state) {
+        scoreLabel.setText("Score: "  + state.getScore());
+        speedLabel.setText("Speed: "  + String.format("%.1f", state.getSpeedMultiplier()) + "x");
+        startLabel.setText("Start: "  + formatEpoch(state.getStartTimeMs()));
+        elapsedLabel.setText("Time: " + formatElapsed(state.getElapsedMs()));
+        updateBounces(state);
+    }
+
+    private void updateBounces(GameStateDto state) {
+        bouncesPanel.removeAll();
+        int i = 1;
+        for (Ball b : state.getBalls()) {
+            JLabel lbl = new JLabel("Ball " + i++ + ": " + b.getBounceCount() + " bounces");
+            styleLabel(lbl);
+            bouncesPanel.add(lbl);
+        }
+        bouncesPanel.revalidate();
+    }
+
+    private String formatEpoch(long ms) {
+        if (ms == 0) return "--:--:--";
+        LocalTime t = Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault()).toLocalTime();
+        return String.format("%02d:%02d:%02d", t.getHour(), t.getMinute(), t.getSecond());
+    }
+
+    private String formatElapsed(long ms) {
+        long secs = ms / 1000;
+        long h    = secs / 3600;
+        long m    = (secs % 3600) / 60;
+        long s    = secs % 60;
+        return String.format("%02d:%02d:%02d", h, m, s);
+    }
+}
+
+
+────────────────────────────────────────────────────────────────────────────────
+ARCHIVO 5: view/pong/StartPanel.java
+────────────────────────────────────────────────────────────────────────────────
+
+package co.edu.uptc.view.pong;
+
+import co.edu.uptc.interfaces.PresenterInterface;
+import co.edu.uptc.view.pong.util.GameTheme;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+public class StartPanel extends JPanel {
+
+    private PresenterInterface presenter;
+
+    public StartPanel() {
+        setLayout(new GridBagLayout());
+        setBackground(GameTheme.BG_DARK);
+        buildUi();
+    }
+
+    public void setPresenter(PresenterInterface presenter) {
+        this.presenter = presenter;
+    }
+
+    private void buildUi() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx  = 0;
+        gbc.insets = new Insets(12, 0, 12, 0);
+        gbc.gridy  = 0; add(buildTitle(),       gbc);
+        gbc.gridy  = 1; add(buildStartButton(), gbc);
+    }
+
+    private JLabel buildTitle() {
+        JLabel title = new JLabel("PONG");
+        title.setFont(GameTheme.FONT_TITLE);
+        title.setForeground(GameTheme.ACCENT_NEON);
+        return title;
+    }
+
+    private JButton buildStartButton() {
+        JButton btn = new JButton("JUGAR");
+        btn.setFont(GameTheme.FONT_HUD);
+        btn.setBackground(GameTheme.ACCENT_NEON);
+        btn.setForeground(Color.BLACK);
+        btn.setFocusPainted(false);
+        btn.addActionListener(e -> presenter.onStartGame());
+        return btn;
+    }
+}
+
+
+================================================================================
+FIN DEL ARCHIVO DE REFERENCIA
+================================================================================
