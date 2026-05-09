@@ -26,10 +26,9 @@ public class GamePanel extends GamePanelBase {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         drawBackground(g2);
-        drawBoundaryBox(g2);
-        drawBalls(g2);
-        drawPaddle(g2);
         drawDangerWall(g2);
+        drawPaddle(g2);
+        drawBalls(g2);
     }
 
     private void drawBackground(Graphics2D g2) {
@@ -37,20 +36,9 @@ public class GamePanel extends GamePanelBase {
         g2.fillRect(0, 0, getWidth(), getHeight());
     }
 
-    private void drawBoundaryBox(Graphics2D g2) {
-        g2.setColor(GameTheme.BORDER_COLOR);
-        g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-    }
-
-    private void drawBalls(Graphics2D g2) {
-        g2.setColor(GameTheme.BALL_COLOR);
-        for (Ball b : state.getBalls()) {
-            int x = (int) b.getX();
-            int y = (int) b.getY();
-            int s = (int) b.getSize();
-            if (state.isCircleBall()) g2.fillOval(x, y, s, s);
-            else                      g2.fillRect(x, y, s, s);
-        }
+    private void drawDangerWall(Graphics2D g2) {
+        g2.setColor(GameTheme.WALL_DANGER);
+        g2.fillRect(getWidth() - GameTheme.WALL_WIDTH, 0, GameTheme.WALL_WIDTH, getHeight());
     }
 
     private void drawPaddle(Graphics2D g2) {
@@ -59,11 +47,14 @@ public class GamePanel extends GamePanelBase {
         g2.fillRect(p.getX(), p.getY(), p.getWidth(), p.getHeight());
     }
 
-    private void drawDangerWall(Graphics2D g2) {
-        g2.setColor(GameTheme.WALL_DANGER);
-        g2.drawLine(getWidth() - 1, 0, getWidth() - 1, getHeight());
+    private void drawBalls(Graphics2D g2) {
+        g2.setColor(GameTheme.BALL_COLOR);
+        for (Ball b : state.getBalls()) {
+            int x = (int) b.getX();
+            int y = (int) b.getY();
+            int s = (int) b.getSize();
+            if (b.isCircle()) g2.fillOval(x, y, s, s);
+            else              g2.fillRect(x, y, s, s);
+        }
     }
-
-
-
 }

@@ -7,6 +7,7 @@ public interface PresenterInterface {
     void onKeyReleased(int keyCode);
     void onStartGame();
     void onResetGame();
+    void onRestartGame();
     void onPauseGame();
     void onResumeGame();
     void onAddBall();

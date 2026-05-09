@@ -40,9 +40,17 @@ public class GamePresenter  implements PresenterInterface {
     }
 
     @Override
-    public void onResetGame () {
+    public void onResetGame() {
         stopTimer();
         model.resetGame();
+    }
+
+    @Override
+    public void onRestartGame() {
+        stopTimer();
+        model.resetGame();
+        model.startGame();
+        startTimer();
     }
 
     private void stopTimer() {
@@ -113,11 +121,10 @@ public class GamePresenter  implements PresenterInterface {
     private void tick() {
         movePaddleIfNeeded();
         GameStateDto state = model.getState();
+        view.updateFrame(state);
         if (state.isGameOver()) {
             stopTimer();
             view.showGameOver(state.getScore());
-        } else {
-            view.updateFrame(state);
         }
     }
 

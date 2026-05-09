@@ -37,7 +37,7 @@ public class GameEngine implements ModelInterface {
 
     private void initPaddle() {
         paddle = new Paddle(
-                fieldWidth  - AppConfig.getPaddleWidth() - 10,
+                fieldWidth  - AppConfig.getPaddleWidth(),
                 fieldHeight / 2 - AppConfig.getPaddleHeight() / 2,
                 AppConfig.getPaddleWidth(),
                 AppConfig.getPaddleHeight()
@@ -94,6 +94,7 @@ public class GameEngine implements ModelInterface {
 
     @Override
     public void movePaddle(int dy) {
+        if (paused) return;
         paddle.setY(clampPaddleY(paddle.getY() + dy));
     }
 
@@ -132,7 +133,7 @@ public class GameEngine implements ModelInterface {
         while (!gameOver) {
             waitIfPaused();
             long now  = System.nanoTime();
-            double dt = (now - last) / 1_000_000_000.0;
+            double dt = Math.min((now - last) / 1_000_000_000.0, 0.016);
             last = now;
             updateSingleBall(ball, dt);
             sleepMillis(8);
@@ -191,7 +192,8 @@ public class GameEngine implements ModelInterface {
                 ball.setBounceCount(ball.getBounceCount() + 1);
                 score++;
                 autoAdjustSpeed();
-            } else if (ball.getX() >= fieldWidth) {
+            } else {
+                ball.setX(fieldWidth - ball.getSize());
                 gameOver = true;
             }
         }
