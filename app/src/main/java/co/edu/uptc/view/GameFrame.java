@@ -7,13 +7,13 @@ import co.edu.uptc.util.I18n;
 import co.edu.uptc.view.pong.GamePanel;
 import co.edu.uptc.view.pong.SideInfoPanel;
 import co.edu.uptc.view.pong.StartPanel;
+import co.edu.uptc.view.pong.util.GameButton;
 import co.edu.uptc.view.pong.util.GameTheme;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
-import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -25,16 +25,12 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.border.Border;
 
 public class GameFrame extends JFrame implements ViewInterface {
 
@@ -48,13 +44,13 @@ public class GameFrame extends JFrame implements ViewInterface {
     private StartPanel         startPanel;
     private GamePanel          gamePanel;
     private SideInfoPanel      sidePanel;
-    private JButton            pauseBtn;
-    private JButton            addSpeedBtn;
-    private JButton            decSpeedBtn;
-    private JButton            addBallBtn;
-    private JButton            darkBtn;
-    private JButton            resetBtn;
-    private JButton            homeBtn;
+    private GameButton         pauseBtn;
+    private GameButton         addSpeedBtn;
+    private GameButton         decSpeedBtn;
+    private GameButton         addBallBtn;
+    private GameButton         darkBtn;
+    private GameButton         resetBtn;
+    private GameButton         homeBtn;
     private boolean            paused          = false;
     private boolean            darkMode        = false;
     private boolean            gameActive      = false;
@@ -72,7 +68,6 @@ public class GameFrame extends JFrame implements ViewInterface {
     @Override
     public void start() {
         applyMacColorFix();
-        System.setProperty("sun.java2d.uiScale", "1.0");
         setTitle(i18n.get("app.title"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -123,71 +118,51 @@ public class GameFrame extends JFrame implements ViewInterface {
     }
 
     private void buildSouthBar() {
+        JPanel south = buildSouthPanel();
+        addPauseGroup(south);
+        addGameGroup(south);
+        addNavGroup(south);
+        applyHomeState();
+        add(south, BorderLayout.SOUTH);
+    }
+
+    private JPanel buildSouthPanel() {
         JPanel south = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 8));
         south.setBackground(GameTheme.PANEL_SIDE);
         south.setBorder(BorderFactory.createMatteBorder(2, 0, 0, 0, GameTheme.BORDER_COLOR));
-        pauseBtn    = buildBtn(i18n.get("btn.pause"),     e -> togglePause());
+        return south;
+    }
+
+    private void addPauseGroup(JPanel south) {
+        pauseBtn = new GameButton(i18n.get("btn.pause"), e -> togglePause());
         south.add(pauseBtn);
         south.add(buildDivider());
-        addSpeedBtn = buildBtn(i18n.get("btn.add.speed"), e -> presenter.onIncreaseSpeed());
-        decSpeedBtn = buildBtn(i18n.get("btn.dec.speed"), e -> presenter.onDecreaseSpeed());
-        addBallBtn  = buildBtn(i18n.get("btn.add.ball"),  e -> presenter.onAddBall());
-        darkBtn     = buildBtn(i18n.get("btn.dark.enable"), e -> toggleDarkMode());
+    }
+
+    private void addGameGroup(JPanel south) {
+        addSpeedBtn = new GameButton(i18n.get("btn.add.speed"), e -> presenter.onIncreaseSpeed());
+        decSpeedBtn = new GameButton(i18n.get("btn.dec.speed"), e -> presenter.onDecreaseSpeed());
+        addBallBtn  = new GameButton(i18n.get("btn.add.ball"),  e -> presenter.onAddBall());
+        darkBtn     = new GameButton(i18n.get("btn.dark.enable"), e -> toggleDarkMode());
         south.add(addSpeedBtn);
         south.add(decSpeedBtn);
         south.add(addBallBtn);
         south.add(darkBtn);
         south.add(buildDivider());
-        resetBtn = buildBtn(i18n.get("btn.reset"), e -> doReset());
-        homeBtn  = buildBtn(i18n.get("btn.home"),  e -> doGoHome());
+    }
+
+    private void addNavGroup(JPanel south) {
+        resetBtn = new GameButton(i18n.get("btn.reset"), e -> doReset());
+        homeBtn  = new GameButton(i18n.get("btn.home"),  e -> doGoHome());
         south.add(resetBtn);
         south.add(homeBtn);
-        applyHomeState();
-        add(south, BorderLayout.SOUTH);
     }
 
     private JSeparator buildDivider() {
         JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
         sep.setForeground(GameTheme.BORDER_COLOR);
-        sep.setPreferredSize(new java.awt.Dimension(1, 28));
+        sep.setPreferredSize(new Dimension(1, 28));
         return sep;
-    }
-
-    private JButton buildBtn(String label, ActionListener listener) {
-        JButton btn = new JButton(label);
-        btn.setFont(GameTheme.FONT_SIDE_LABEL);
-        btn.setBackground(GameTheme.PANEL_SIDE);
-        btn.setForeground(GameTheme.ACCENT_NEON);
-        btn.setOpaque(true);
-        btn.setFocusPainted(false);
-        btn.setBorder(buildBtnBorder(false));
-        btn.addActionListener(listener);
-        btn.addMouseListener(buildHoverListener(btn));
-        return btn;
-    }
-
-    private Border buildBtnBorder(boolean hovered) {
-        Color line = hovered ? GameTheme.ACCENT_NEON : GameTheme.BORDER_COLOR;
-        return BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(line, 1),
-            BorderFactory.createEmptyBorder(4, 12, 4, 12));
-    }
-
-    private MouseAdapter buildHoverListener(JButton btn) {
-        return new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) {
-                if (btn.isEnabled()) applyHoverStyle(btn, true);
-            }
-            @Override public void mouseExited(MouseEvent e) {
-                applyHoverStyle(btn, false);
-            }
-        };
-    }
-
-    private void applyHoverStyle(JButton btn, boolean hovered) {
-        btn.setBackground(hovered ? GameTheme.BORDER_COLOR : GameTheme.PANEL_SIDE);
-        btn.setForeground(hovered ? Color.WHITE : GameTheme.ACCENT_NEON);
-        btn.setBorder(buildBtnBorder(hovered));
     }
 
     private void togglePause() {
@@ -230,12 +205,12 @@ public class GameFrame extends JFrame implements ViewInterface {
     }
 
     private void applyHomeState() {
-        setBtnEnabled(pauseBtn,    false);
-        setBtnEnabled(addSpeedBtn, false);
-        setBtnEnabled(decSpeedBtn, false);
-        setBtnEnabled(addBallBtn,  false);
-        setBtnEnabled(resetBtn,    false);
-        setBtnEnabled(homeBtn,     false);
+        pauseBtn.setEnabled(false);
+        addSpeedBtn.setEnabled(false);
+        decSpeedBtn.setEnabled(false);
+        addBallBtn.setEnabled(false);
+        resetBtn.setEnabled(false);
+        homeBtn.setEnabled(false);
         darkBtn.setEnabled(true);
     }
 
@@ -253,15 +228,10 @@ public class GameFrame extends JFrame implements ViewInterface {
         pauseBtn.setEnabled(true);
         addSpeedBtn.setEnabled(true);
         decSpeedBtn.setEnabled(true);
-        setBtnEnabled(addBallBtn, false);
+        addBallBtn.setEnabled(false);
         darkBtn.setEnabled(true);
         resetBtn.setEnabled(true);
         homeBtn.setEnabled(true);
-    }
-
-    private void setBtnEnabled(JButton btn, boolean enabled) {
-        btn.setEnabled(enabled);
-        if (!enabled) applyHoverStyle(btn, false);
     }
 
     private boolean confirmAction(String titleKey, String msgKey,
@@ -335,14 +305,12 @@ public class GameFrame extends JFrame implements ViewInterface {
 
     @Override
     public void updateFrame(GameStateDto state) {
-        SwingUtilities.invokeLater(() -> {
-            if (!gameActive) activateGameButtons();
-            syncPauseButton(state.isPaused());
-            syncDarkButton(state.isDarkMode());
-            gamePanel.applyState(state);
-            sidePanel.applyState(state);
-            showCard(CARD_GAME);
-        });
+        if (!gameActive) activateGameButtons();
+        syncPauseButton(state.isPaused());
+        syncDarkButton(state.isDarkMode());
+        gamePanel.applyState(state);
+        sidePanel.applyState(state);
+        showCard(CARD_GAME);
     }
 
     private void activateGameButtons() {
