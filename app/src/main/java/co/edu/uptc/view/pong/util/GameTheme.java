@@ -17,6 +17,8 @@ public final class GameTheme {
     public static final Color BORDER_COLOR = Color.decode("#1E3A5F");
     public static final Color PANEL_SIDE   = Color.decode("#0D1B2E");
     public static final Color INFO_LABEL   = Color.decode("#8BA8CC");
+    public static final Color BTN_HOVER_FG = Color.WHITE;
+    public static final Color SIDE_TITLE_FG = Color.WHITE;
 
     public static final int WALL_WIDTH = 7;
 
