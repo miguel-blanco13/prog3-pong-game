@@ -11,7 +11,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -20,8 +19,12 @@ import java.time.format.DateTimeFormatter;
 
 public class SideInfoPanel extends JPanel {
 
-    private static final I18n              i18n     = I18n.getInstance();
-    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final I18n              i18n         = I18n.getInstance();
+    private static final DateTimeFormatter TIME_FMT     = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final int               PANEL_WIDTH   = 220;
+    private static final int               PANEL_PADDING = 16;
+    private static final int               GAP_HEADER    = 8;
+    private static final int               GAP_STAT      = 12;
 
     private final JLabel bouncesName  = makeName();
     private final JLabel bouncesValue = makeValue("--");
@@ -36,9 +39,9 @@ public class SideInfoPanel extends JPanel {
 
     public SideInfoPanel() {
         setBackground(GameTheme.PANEL_SIDE);
-        setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+        setBorder(BorderFactory.createEmptyBorder(PANEL_PADDING, PANEL_PADDING, PANEL_PADDING, PANEL_PADDING));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setPreferredSize(new Dimension(220, 0));
+        setPreferredSize(new Dimension(PANEL_WIDTH, 0));
         initNames();
         addComponents();
     }
@@ -59,27 +62,27 @@ public class SideInfoPanel extends JPanel {
 
     private void addHeader() {
         add(buildTitleLabel());
-        add(Box.createVerticalStrut(8));
+        add(Box.createVerticalStrut(GAP_HEADER));
         add(buildSeparator());
-        add(Box.createVerticalStrut(12));
+        add(Box.createVerticalStrut(GAP_STAT));
     }
 
     private void addStats() {
         add(buildRow(bouncesName,  bouncesValue));
-        add(Box.createVerticalStrut(12));
+        add(Box.createVerticalStrut(GAP_STAT));
         add(buildRow(startName,   startValue));
-        add(Box.createVerticalStrut(12));
+        add(Box.createVerticalStrut(GAP_STAT));
         add(buildRow(elapsedName, elapsedValue));
-        add(Box.createVerticalStrut(12));
+        add(Box.createVerticalStrut(GAP_STAT));
         add(buildRow(scoreName,   scoreValue));
-        add(Box.createVerticalStrut(12));
+        add(Box.createVerticalStrut(GAP_STAT));
         add(buildRow(speedName,   speedValue));
     }
 
     private JLabel buildTitleLabel() {
         JLabel title = new JLabel(i18n.get("side.title"));
         title.setFont(GameTheme.FONT_SIDE_TITLE);
-        title.setForeground(Color.WHITE);
+        title.setForeground(GameTheme.SIDE_TITLE_FG);
         title.setAlignmentX(LEFT_ALIGNMENT);
         return title;
     }

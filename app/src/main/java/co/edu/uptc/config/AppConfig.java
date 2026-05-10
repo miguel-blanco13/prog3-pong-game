@@ -49,4 +49,8 @@ public class AppConfig {
     public static int getSpeedTimeInterval() {
         return Integer.parseInt(cfg.get("speed.time.interval", "30"));
     }
+
+    public static int getBounceSpeedInterval() {
+        return Integer.parseInt(cfg.get("speed.bounce.interval", "5"));
+    }
 }

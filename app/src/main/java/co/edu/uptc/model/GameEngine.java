@@ -11,6 +11,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class GameEngine implements ModelInterface {
 
+    private static final double TIMER_FPS          = 60.0;
+    private static final double MAX_DT             = 0.016;
+    private static final long   BALL_SLEEP_MS      = 8L;
+    private static final long   RESET_WAIT_MS      = 20L;
+    private static final long   MS_PER_SECOND      = 1_000L;
+
     private final BallList<Ball> balls = new BallList<>();
     private final ReentrantLock lock   = new ReentrantLock();
     private final Object pauseLock     = new Object();
@@ -60,7 +66,7 @@ public class GameEngine implements ModelInterface {
         gameOver = true;
         paused   = false;
         synchronized (pauseLock) { pauseLock.notifyAll(); }
-        sleepMillis(20);
+        sleepMillis(RESET_WAIT_MS);
         lock.lock();
         try { balls.clear(); }
         finally { lock.unlock(); }
@@ -93,8 +99,9 @@ public class GameEngine implements ModelInterface {
     }
 
     @Override
-    public void movePaddle(int dy) {
+    public void movePaddle(int direction) {
         if (paused) return;
+        int dy = (int) Math.round(AppConfig.getPaddleSpeed() / TIMER_FPS) * direction;
         paddle.setY(clampPaddleY(paddle.getY() + dy));
     }
 
@@ -133,10 +140,10 @@ public class GameEngine implements ModelInterface {
         while (!gameOver) {
             waitIfPaused();
             long now  = System.nanoTime();
-            double dt = Math.min((now - last) / 1_000_000_000.0, 0.016);
+            double dt = Math.min((now - last) / 1_000_000_000.0, MAX_DT);
             last = now;
             updateSingleBall(ball, dt);
-            sleepMillis(8);
+            sleepMillis(BALL_SLEEP_MS);
         }
     }
 
@@ -206,7 +213,7 @@ public class GameEngine implements ModelInterface {
     }
 
     private void autoAdjustSpeed() {
-        if (score - lastAutoBumpScore >= 5) {
+        if (score - lastAutoBumpScore >= AppConfig.getBounceSpeedInterval()) {
             increaseSpeed();
             lastAutoBumpScore = score;
         }
@@ -214,7 +221,7 @@ public class GameEngine implements ModelInterface {
 
     private void checkTimeSpeed() {
         if (startTimeMs == 0 || paused) return;
-        long interval = AppConfig.getSpeedTimeInterval() * 1000L;
+        long interval = AppConfig.getSpeedTimeInterval() * MS_PER_SECOND;
         long elapsed  = computeElapsed();
         if (elapsed - lastTimeSpeedMs >= interval) {
             increaseSpeed();
