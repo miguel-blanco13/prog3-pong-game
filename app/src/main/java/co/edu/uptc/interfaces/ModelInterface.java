@@ -7,7 +7,7 @@ public interface ModelInterface {
     void resetGame();
     void pauseGame();
     void resumeGame();
-    void movePaddle(int dy);
+    void movePaddle(int direction);
     void addBall();
     void increaseSpeed();
     void decreaseSpeed();

@@ -1,6 +1,5 @@
 package co.edu.uptc.presenter;
 
-import co.edu.uptc.config.AppConfig;
 import co.edu.uptc.dto.GameStateDto;
 import co.edu.uptc.interfaces.ModelInterface;
 import co.edu.uptc.interfaces.PresenterInterface;
@@ -82,10 +81,8 @@ public class GamePresenter  implements PresenterInterface {
     }
 
     private void movePaddleIfNeeded() {
-        int dy = 0;
-        if (upPressed)   dy -= AppConfig.getPaddleSpeed() / 60;
-        if (downPressed) dy += AppConfig.getPaddleSpeed() / 60;
-        if (dy != 0) model.movePaddle(dy);
+        if (upPressed)   model.movePaddle(-1);
+        if (downPressed) model.movePaddle(1);
     }
 
     @Override
